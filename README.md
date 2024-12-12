@@ -15,6 +15,7 @@
 2. **Создание виртуального окружения:**
 
     ```bash
+    sudo apt install -y python3-venv 
     python3 -m venv .venv
     source .venv/bin/activate  # Для Windows: .venv\Scripts\activate
     ```
@@ -71,9 +72,9 @@
     After=network.target
 
     [Service]
-    User=username  # Имя пользователя, от которого будет запущен бот
-    WorkingDirectory=/home/username/simply-client-bot  # Путь к папке проекта
-    ExecStart=/home/username/simply-client-bot/.venv/bin/python /home/username/simply-client-bot/run.py # Заменить имя пользователя
+    User=USERNAME
+    WorkingDirectory=/home/USERNAME/simply-client-bot
+    ExecStart=/home/USERNAME/simply-client-bot/.venv/bin/python /home/USERNAME/simply-client-bot/run.py
     Restart=always
     RestartSec=5
     Environment=PYTHONUNBUFFERED=1
@@ -108,4 +109,20 @@
 
     ```bash
     sudo systemctl status simply-client-bot
+    ```
+
+
+## Если нужно внести изменения или доработать код бота, выполните
+
+- Остановите сервис:
+
+    ```bash
+    sudo systemctl stop simply-client-bot
+    ```
+
+- Внесите изменения.
+- Перезапустите:
+
+    ```bash
+    sudo systemctl restart simply-client-bot
     ```
