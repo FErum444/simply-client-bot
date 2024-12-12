@@ -9,7 +9,7 @@
 
     ```bash
     git clone https://github.com/FErum444/simply-client-bot.git
-    cd simply_vpn_bot
+    cd simply-client-bot
     ```
 
 2. **Создание виртуального окружения:**
@@ -55,10 +55,10 @@
 
 1. **Создайте systemd unit-файл:**
 
-    - Создайте файл сервиса, например, `/etc/systemd/system/simply_vpn_bot.service`
+    - Создайте файл сервиса, например, `/etc/systemd/system/simply-client-bot.service`
 
     ```bash
-    sudo nano /etc/systemd/system/simply_vpn_bot.service
+    sudo nano /etc/systemd/system/simply-client-bot.service
     ```
 
 2. **Заполните содержимое unit-файла:**
@@ -72,8 +72,8 @@
 
     [Service]
     User=username  # Имя пользователя, от которого будет запущен бот
-    WorkingDirectory=/home/username/simply_vpn_bot  # Путь к папке проекта
-    ExecStart=/home/username/simply_vpn_bot/.venv/bin/python /home/username/simply_vpn_bot/run.py # Заменить имя пользователя
+    WorkingDirectory=/home/username/simply-client-bot  # Путь к папке проекта
+    ExecStart=/home/username/simply-client-bot/.venv/bin/python /home/username/simply-client-bot/run.py # Заменить имя пользователя
     Restart=always
     RestartSec=5
     Environment=PYTHONUNBUFFERED=1
@@ -93,13 +93,13 @@
 4. **Запустите сервис**
 
     ```bash
-    sudo systemctl start simply_vpn_bot
+    sudo systemctl start simply-client-bot
     ```
 
 5. **Добавьте бот в автозагрузку**
 
     ```bash
-    sudo systemctl enable simply_vpn_bot
+    sudo systemctl enable simply-client-bot
     ```
 
 6. **Проверка статуса сервиса**
@@ -107,5 +107,5 @@
     - Убедитесь, что бот работает
 
     ```bash
-    sudo systemctl status simply_vpn_bot
+    sudo systemctl status simply-client-bot
     ```
