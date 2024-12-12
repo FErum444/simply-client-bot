@@ -28,7 +28,7 @@
 4. **Настройка конфигурации:**
 
     - Создайте файл `.env` в корне проекта.
-    - Добавьте ваш Telegram-бот токен:
+    - Добавьте ваш Telegram-бот токен и другие данные:
 
     ```env
     API_TOKEN=your_telegram_bot_token_here
@@ -59,7 +59,7 @@
 
     ```bash
     sudo nano /etc/systemd/system/simply_vpn_bot.service
-        ```
+    ```
 
 2. **Заполните содержимое unit-файла:**
 
