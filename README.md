@@ -63,32 +63,32 @@
 
 2. **Заполните содержимое unit-файла:**
 
-Пример файла сервиса:
+    - Пример файла сервиса
         
-    ```ini
-    [Unit]
-    Description=Simply VPN Bot
-    After=network.target
+        ```ini
+        [Unit]
+        Description=Simply VPN Bot
+        After=network.target
 
-    [Service]
-    User=username  # Имя пользователя, от которого будет запущен бот
-    WorkingDirectory=/home/username/simply_vpn_bot  # Путь к папке проекта
-    ExecStart=/home/username/simply_vpn_bot/.venv/bin/python /home/username/simply_vpn_bot/run.py
-    Restart=always
-    RestartSec=5
-    Environment=PYTHONUNBUFFERED=1
+        [Service]
+        User=username  # Имя пользователя, от которого будет запущен бот
+        WorkingDirectory=/home/username/simply_vpn_bot  # Путь к папке проекта
+        ExecStart=/home/username/simply_vpn_bot/.venv/bin/python /home/username/simply_vpn_bot/run.py # Заменить имя пользователя
+        Restart=always
+        RestartSec=5
+        Environment=PYTHONUNBUFFERED=1
 
-    [Install]
-    WantedBy=multi-user.target
-    ```
+        [Install]
+        WantedBy=multi-user.target
+        ```
 
 3. **Перезагрузите `systemd` для применения изменений:**
 
-Выполните команду:
+    - Выполните команду
 
-    ```bash
-    sudo systemctl daemon-reload
-    ```
+        ```bash
+        sudo systemctl daemon-reload
+        ```
 
 4. **Запустите сервис**
 
@@ -104,8 +104,8 @@
 
 6. **Проверка статуса сервиса**
 
-Убедитесь, что бот работает:
+    - Убедитесь, что бот работает
 
-    ```bash
-    sudo systemctl status simply_vpn_bot
-    ```
+        ```bash
+        sudo systemctl status simply_vpn_bot
+        ```
