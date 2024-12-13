@@ -42,7 +42,7 @@
     WEB_SERVER_PORT=8443
     WEBHOOK_PATH=/webhook
     WEBHOOK_SECRET=your_webhook_secret
-    BASE_WEBHOOK_URL=https://example.com
+    BASE_WEBHOOK_URL=https://example.com:8443
     ```
 
 5. **Инициализация базы данных:**
@@ -126,3 +126,42 @@
     ```bash
     sudo systemctl restart simply-client-bot
     ```
+
+## Дополнительно
+
+- настройка nginx
+
+    ```bash
+    server {
+        listen 8443 ssl;
+        server_name https://example.com;
+
+        # Путь до сертификатов
+        ssl_certificate /home/marzban/.acme.sh/example.com_ecc/fullchain.cer;
+        ssl_certificate_key /home/marzban/.acme.sh/example.com_ecc/example.com.key;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';
+        ssl_prefer_server_ciphers on;
+
+        root /var/www/example.com;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        # Прокси для вебхука бота
+        location /webhook {
+            proxy_pass http://127.0.0.1:8000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+    ```
+
+    - Проверить Webhook
+
+        ```bash
+        https://api.telegram.org/bot<API_TOKEN>/getWebhookInfo
+        ```

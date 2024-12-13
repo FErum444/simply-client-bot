@@ -101,8 +101,6 @@ async def catalog(callback: CallbackQuery):
 @router.callback_query(F.data.startswith('plan_'))
 async def category(callback: CallbackQuery):
     plan_data =  await rq.get_plan(callback.data.split('_')[1])
-    # user_id = callback.from_user.id
-    # print(await rq.bill_exists(user_id))
 
     if plan_data.price > 0:
         await callback.answer('')
@@ -140,7 +138,6 @@ async def pay_plan_one(callback: CallbackQuery):
             "Если возникнут вопросы или проблемы, не переживай — мы всегда рядом! Обращайся в наш чат техподдержки <a href='https://t.me/simply_network_support'>тут</a> 🔧💬"
         )
 
-
         await callback.answer('')
         await callback.message.answer_photo(caption=invoice, photo=input_file, reply_markup=await kb.check_pay(callback.data.split('_')[1], bill_number), parse_mode="HTML")
     
@@ -176,15 +173,13 @@ async def pay_plan_one(callback: CallbackQuery):
             await callback.answer('')
             await callback.message.answer(check, reply_markup=await kb.inline_buttons(), parse_mode="HTML")
 
-# Высавление счета на оплату
+# Проверка оплаты в блокчейне
 @router.callback_query(F.data.startswith('check_pay_'))
 async def check_pay(callback: CallbackQuery):
     plan_data =  await rq.get_plan(callback.data.split('_')[2])
     
-    # bill_number = callback.data.split('_')[3]
-    # price = int(plan_data.price)
-    bill_number = "ferum444_65778833" # Тестовый
-    price = 0.1 # Тестовый
+    bill_number = callback.data.split('_')[3]
+    price = int(plan_data.price)
     
     validation = payment_validation(bill_number, price)
 
@@ -234,5 +229,3 @@ async def check_pay(callback: CallbackQuery):
         
     else: 
         await callback.answer(f'Платеж еще не поступил! Возможно блокчейн перегружен. Такое иногда бывает, подождите пару минут и повторите попытку', show_alert=True)
-
-
