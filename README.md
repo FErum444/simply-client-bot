@@ -162,6 +162,6 @@
 
     - Проверить Webhook
 
-        ```bash
-        https://api.telegram.org/bot<API_TOKEN>/getWebhookInfo
-        ```
+    ```bash
+    https://api.telegram.org/bot<API_TOKEN>/getWebhookInfo
+    ```
