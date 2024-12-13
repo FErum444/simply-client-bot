@@ -40,16 +40,20 @@ async def cmd_info(callback: CallbackQuery):
 
     user_id = callback.from_user.id
     active_subscriptions = await rq.get_active_subscriptions(user_id)
-    active_subscriptions_2 = await rq.get_active_subscriptions(user_id)
-    final_end_date = await calculate_end_date(active_subscriptions)
+    
+    if active_subscriptions:
+        
+        table_rows = ""
+        for subscription in active_subscriptions:
+            table_rows += f"Название: {subscription.plan}\nПродолжительность: {subscription.duration} Мес.\nДата приобретения: {subscription.issue_date}\n\n"
 
-    table_rows = ""
-    for subscription in active_subscriptions_2:
-        table_rows += f"Название: {subscription.plan}\nПродолжительность: {subscription.duration} Мес.\nДата приобретения: {subscription.issue_date}\n\n"
-    
-    
-    
-    subscription_message = f"Ваши подписки:\n\n{table_rows}Срок истечения всех подписок: {final_end_date}"
+        final_end_date = await calculate_end_date(active_subscriptions)
+        
+        subscription_message = f"Ваши подписки:\n\n{table_rows}Срок истечения всех подписок: {final_end_date}"
+
+    else:
+        subscription_message = "У вас нет Активных подписок. Самое время выбрать одино из наших классных предложений!"
+
     
     await callback.answer('')
     await callback.message.answer(subscription_message, reply_markup=kb.main, parse_mode="Markdown")

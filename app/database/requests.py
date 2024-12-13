@@ -45,7 +45,11 @@ async def set_subscription(tg_id, bill_number, plan, duration, payment_info):
 
 async def get_active_subscriptions(tg_id):
     async with async_session() as session:
-        return await session.scalars(select(Subscription).where(Subscription.tg_id == tg_id, Subscription.status == True))
+        result = await session.scalars(select(Subscription).where(Subscription.tg_id == tg_id, Subscription.status == True))
+        if result:
+            return result.all()
+        else:
+            return []
 
 async def check_free_bill_exists(tg_id: int):
     async with async_session() as session:
