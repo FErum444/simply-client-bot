@@ -62,8 +62,9 @@ async def cmd_info(callback: CallbackQuery):
 # /default
 @router.message(Command('default'))
 async def cmd_default(message: Message):
-    await rq.default_plans()
-    await message.reply('База данных заполнена')
+    if message.from_user.id == ADMIN_ID:
+        await rq.default_plans()
+        await message.reply('База данных заполнена')
 
 # Показываем Планы подписки
 @router.callback_query(F.data == 'catalog')
