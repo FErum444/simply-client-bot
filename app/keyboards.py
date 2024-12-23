@@ -7,7 +7,7 @@ from app.database.requests import get_plans
 
 # Главное Меню Инлайн
 main = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Цены', callback_data='catalog')], [InlineKeyboardButton(text='Инфо', callback_data='info')]
+    [InlineKeyboardButton(text='Посмотреть тарифы', callback_data='catalog')], [InlineKeyboardButton(text='Инфо', callback_data='info')]
 ])
 
 # Выбор Тарифа Инлайн (Новая)
@@ -48,4 +48,8 @@ async def free_activate(id_plan):
 # Админская чекпойнт клавиатура (нигечго не делает)
 admin_check_point = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Добавить', url="https://globalsimply.ru:4444/dashboard/")]
+])
+
+how_to_use = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='Как пользоваться?', callback_data='how_to_use')]
 ])

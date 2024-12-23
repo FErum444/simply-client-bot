@@ -111,7 +111,8 @@ def add_new_user(username, token_data):
 
         response = requests.post(url, headers=headers, data=json_payload, timeout=10)
         response.raise_for_status()
-        print(response.text)
+        # print(response.text)
+        return response.json()
 
     except requests.exceptions.RequestException as e:
         print(f"Ошибка при добавлении пользователя: {e}")
@@ -165,7 +166,8 @@ def modify_user(username, token_data, **kwargs):
         response = requests.put(url, headers=headers, json=payload, timeout=10)
         response.raise_for_status()
 
-        print("Пользователь успешно изменен:", response.json())
+        # print("Пользователь успешно изменен:", response.json())
+        return response.json()
 
     except requests.exceptions.RequestException as e:
         print(f"Ошибка при изменении пользователя: {e}")

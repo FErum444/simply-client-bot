@@ -9,6 +9,7 @@ import app.keyboards as kb
 from config import ADMIN_ID
 from app.utils import bill_url, qr_generator, generate_bill_id, payment_validation, calculate_end_date
 import app.database.requests as rq
+from app.services import make_request, check_user_exists, add_new_user, modify_user
 
 router = Router()
 
@@ -21,7 +22,7 @@ description_menu = (
     "У нас есть <a href=\"#\">телеграм-канал</a> с крутыми новостями и <a href=\"#\">чат техподдержки</a>, где тебя поймут, выслушают и помогут. Захочешь — заглядывай!"
 )
 
-# Оттвен на команду /start
+# Ответ на команду /start
 @router.message(CommandStart() or F.data == ('main'))
 async def cmd_start(message: Message):
     await rq.set_user(message.from_user.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name)
@@ -176,9 +177,9 @@ async def pay_plan_one(callback: CallbackQuery):
 # Проверка оплаты в блокчейне
 @router.callback_query(F.data.startswith('check_pay_'))
 async def check_pay(callback: CallbackQuery):
-    plan_data =  await rq.get_plan(callback.data.split('_')[2])
-    
+    plan_data = await rq.get_plan(callback.data.split('_')[2])
     bill_number = callback.data.split('_')[3]
+    
     price = int(plan_data.price)
     
     validation = payment_validation(bill_number, price)
@@ -195,6 +196,19 @@ async def check_pay(callback: CallbackQuery):
         first_name = callback.from_user.first_name
         last_name = callback.from_user.last_name
 
+        # Получаем токен и заголовки
+        token_data, headers = make_request()
+
+        # Проверяем, существует ли пользователь
+        if not check_user_exists(user_id, token_data):
+            # Если пользователь не существует, создаём его
+            user_vpn_data = add_new_user(user_id, token_data)
+        else:
+            # Если пользователь существует, обновляем его статус на active
+            user_vpn_data = modify_user(user_id, token_data, status="active")
+        
+        links = user_vpn_data.get('links', [])
+
         admin_message = (
             f"Пользователь: <b>@{username}</b>\n"
             f"UserID: <code>{user_id}</code>\n"
@@ -205,7 +219,7 @@ async def check_pay(callback: CallbackQuery):
             f"План подписки: <b>{plan}</b>\n"
             f"Цена: <b>{price} Ton</b>\n"
             f"Срок действия: <b>{duration} мес.</b>\n\n"
-            "<b>Требуется модерация.</b>"
+            f"<code>{links[0]}</code>"
         )
 
         success_message = (
@@ -219,13 +233,35 @@ async def check_pay(callback: CallbackQuery):
             "📌 <b>Что дальше?</b>\n"
             "Смело отправляйся в интернет-приключения, но если вдруг тёмные интернет-колдуны попробуют навредить, мы на страже! "
             "Задай вопросы или получи помощь в нашем <a href='https://t.me/simply_network_support'>чате техподдержки</a>.\n\n"
-            "💪 Спасибо, что выбрал нас!"
+            "💪 Спасибо, что выбрал нас!\n\n"
+            f"<code>{links[0]}</code>"
         )
 
         await rq.set_subscription(user_id, bill_number, plan, duration, str(validation))
         await callback.answer('Успешно')
-        await callback.message.edit_caption(caption=success_message, parse_mode="HTML")
+        await callback.message.edit_caption(caption=success_message, parse_mode="HTML", reply_markup=kb.how_to_use)
         await bot.send_message(chat_id=ADMIN_ID, text=admin_message, reply_markup=kb.admin_check_point, parse_mode="HTML")
         
     else: 
         await callback.answer(f'Платеж еще не поступил! Возможно блокчейн перегружен. Такое иногда бывает, подождите пару минут и повторите попытку', show_alert=True)
+
+
+# Показываем Планы подписки
+@router.callback_query(F.data == 'how_to_use')
+async def how_to_use(callback: CallbackQuery):
+    await callback.answer('')
+    tariff_description = (
+        "Как стать частью элиты анонимного интернета?\n\n"
+        "1️⃣ Скачай приложение из  "
+        "<a href='https://apps.apple.com/us/app/amneziavpn/id1600529900'>App Store</a>, "
+        "<a href='https://play.google.com/store/apps/details?id=org.amnezia.vpn'>Google Play</a> или с "
+        "<a href='https://amnezia.org/ru/downloads'>официального сайта</a>. Мы дружим с "
+        "<a href='https://github.com/amnezia-vpn/amnezia-client/releases/download/4.8.2.3/AmneziaVPN_4.8.2.3.dmg'>Mac OS</a>, "
+        "<a href='https://github.com/amnezia-vpn/amnezia-client/releases/download/4.8.2.3/AmneziaVPN_4.8.2.3_x64.exe'>Windows</a> "
+        "и даже <a href='https://github.com/amnezia-vpn/amnezia-client/releases/download/4.8.2.3/AmneziaVPN_4.8.2.3_Linux_installer.tar.zip'>Linux</a>. 🖥\n"
+        "2️⃣ Открой приложение AmneziaVPN и нажми кнопку «Приступим».\n"
+        "3️⃣ Вставляй сюда длинную ссылку, указанную в чеке выше.\n\n"
+        "Вуаля! Ты уже серфишь по интернету безопасно и без страха. 🕶"
+    )
+
+    await callback.message.answer(tariff_description, reply_markup=await kb.inline_buttons(), parse_mode="HTML")

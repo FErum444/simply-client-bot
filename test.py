@@ -3,7 +3,7 @@ from app.services import make_request, add_new_user, check_user_exists, modify_u
 
 
 token_data, headers = make_request()
-username = 'Test_1'
+username = '65778833'
 
 # Заводим VPN польгователя
 # add_new_user(username, token_data)
@@ -14,5 +14,5 @@ username = 'Test_1'
 
 
 # Вызываем функцию для изменения параметров VPN пользователя "active" "disabled"
-params_to_modify = {"status": "active",}
-modify_user(username, token_data, **params_to_modify)
+# params_to_modify = {"status": "active",}
+# modify_user(username, token_data, **params_to_modify)
