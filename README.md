@@ -39,10 +39,15 @@
     THRESHOLD=0.01
 
     WEB_SERVER_HOST=127.0.0.1
-    WEB_SERVER_PORT=8443
+    WEB_SERVER_PORT=8000
     WEBHOOK_PATH=/webhook
     WEBHOOK_SECRET=your_webhook_secret
-    BASE_WEBHOOK_URL=https://example.com:8443
+    BASE_WEBHOOK_URL=https://example.com:8000
+
+    ADMIN_USERNAME=your_admin_username
+    ADMIN_PASSWORD=your_admin_password
+
+    TOKEN_FILE=token.json
     ```
 
 5. **Инициализация базы данных:**

@@ -21,8 +21,15 @@ DB_URI = os.getenv('DB_URI', 'sqlite+aiosqlite:///db.sqlite3')
 # Трешход в процентах - для проверки отклонения суммы платежа
 THRESHOLD = float(os.getenv('THRESHOLD', 0.01))
 
+# Настройки Webhook
 WEB_SERVER_HOST = os.getenv('WEB_SERVER_HOST', '127.0.0.1')
 WEB_SERVER_PORT = int(os.getenv('WEB_SERVER_PORT', 8443))
 WEBHOOK_PATH = os.getenv('WEBHOOK_PATH', '/webhook')
 WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET')
 BASE_WEBHOOK_URL = os.getenv('BASE_WEBHOOK_URL')
+
+# Авторизация Админа в Marzban
+ADMIN_USERNAME = os.getenv('ADMIN_USERNAME')
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
+
+TOKEN_FILE = os.getenv('TOKEN_FILE')
