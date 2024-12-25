@@ -3,13 +3,13 @@ import json
 import uuid
 import time
 import os
-from config import ADMIN_USERNAME, ADMIN_PASSWORD, BASE_WEBHOOK_URL, TOKEN_FILE
+from config import ADMIN_USERNAME, ADMIN_PASSWORD, API_URL, TOKEN_FILE
 
 def get_token():
     """
     Получение нового токена с API.
     """
-    API_URL = BASE_WEBHOOK_URL + "/api/admin/token"
+    url = API_URL + "/api/admin/token"
     payload = {
         'username': ADMIN_USERNAME,
         'password': ADMIN_PASSWORD,
@@ -17,7 +17,7 @@ def get_token():
     }
 
     try:
-        response = requests.post(API_URL, data=payload, timeout=10)
+        response = requests.post(url, data=payload, timeout=10)
         response.raise_for_status()
         
         token_data = response.json()
@@ -73,7 +73,7 @@ def add_new_user(username, token_data):
     """
     Добавление нового пользователя через API.
     """
-    url = BASE_WEBHOOK_URL + "/api/user"
+    url = API_URL + "/api/user"
     
     payload = {
         "proxies": {
@@ -121,7 +121,7 @@ def check_user_exists(username, token_data):
     """
     Проверяет, существует ли пользователь на сервере.
     """
-    url = BASE_WEBHOOK_URL + f"/api/user/{username}"
+    url = API_URL + f"/api/user/{username}"
     
     try:
         headers = {
@@ -150,7 +150,7 @@ def modify_user(username, token_data, **kwargs):
     :param token_data: Токен авторизации
     :param kwargs: Параметры для изменения, например status, expire, data_limit и т.д.
     """
-    url = BASE_WEBHOOK_URL + f"/api/user/{username}"
+    url = API_URL + f"/api/user/{username}"
 
     try:
         headers = {

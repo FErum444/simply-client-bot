@@ -39,9 +39,10 @@
     THRESHOLD=0.01
 
     WEB_SERVER_HOST=127.0.0.1
-    WEB_SERVER_PORT=8000
+    WEB_SERVER_PORT=8443
     WEBHOOK_PATH=/webhook
     WEBHOOK_SECRET=your_webhook_secret
+    BASE_WEBHOOK_URL=https://example.com
     BASE_WEBHOOK_URL=https://example.com:8000
 
     ADMIN_USERNAME=your_admin_username
@@ -138,29 +139,44 @@
 
     ```bash
     server {
-        listen 8443 ssl;
-        server_name https://example.com;
+        listen 443 ssl http2;
+        listen [::]:443 ssl http2;
+        server_name example.com;
 
         # Путь до сертификатов
-        ssl_certificate /home/marzban/.acme.sh/example.com_ecc/fullchain.cer;
-        ssl_certificate_key /home/marzban/.acme.sh/example.com_ecc/example.com.key;
+        ssl_certificate /var/www/certificates/fullchain.pem;
+        ssl_certificate_key /var/www/certificates/key.pem;
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';
         ssl_prefer_server_ciphers on;
 
-        root /var/www/example.com;
-
-        location / {
-            try_files $uri $uri/ =404;
-        }
-
-        # Прокси для вебхука бота
+        # Проксирование для webhook
         location /webhook {
-            proxy_pass http://127.0.0.1:8000;
+            proxy_pass http://127.0.0.1:8443; # Локальный сервер вебхука
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Проксирование для Marzban
+        location ~* /marzban/.+/(.+)$ {
+            proxy_redirect off;
+            proxy_pass http://127.0.0.1:$1/; # Динамическое проксирование портов
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
+        # Проксирование других сервисов (например, API или Dashboard)
+        location ~* /(dashboard|api|docs|redoc|openapi.json) {
+            proxy_pass http://127.0.0.1:8000; # Локальный сервер API
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
     ```

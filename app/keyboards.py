@@ -1,5 +1,7 @@
 # keyboards.py
 
+from config import API_URL
+
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
@@ -47,9 +49,9 @@ async def free_activate(id_plan):
 
 # Админская чекпойнт клавиатура (нигечго не делает)
 admin_check_point = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Добавить', url="https://globalsimply.ru:4444/dashboard/")]
+    [InlineKeyboardButton(text='Добавить', url=f"{API_URL}/dashboard/")]
 ])
 
 how_to_use = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Как пользоваться?', callback_data='how_to_use')]
+    [InlineKeyboardButton(text='Как пользоваться?', callback_data='how_to_use')], [InlineKeyboardButton(text='Инфо', callback_data='info')]
 ])

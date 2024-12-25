@@ -145,9 +145,23 @@ async def pay_plan_one(callback: CallbackQuery):
     if price == 0:
         if await rq.check_free_bill_exists(user_id) == False:
             await rq.add_bill(user_id, bill_number, status, plan, price, None)
+
+            # Получаем токен и заголовки
+            token_data, headers = make_request()
+
+            # Проверяем, существует ли пользователь
+            if not check_user_exists(user_id, token_data):
+                # Если пользователь не существует, создаём его
+                user_vpn_data = add_new_user(user_id, token_data)
+            else:
+                # Если пользователь существует, обновляем его статус на active
+                user_vpn_data = modify_user(user_id, token_data, status="active")
+            
+            links = user_vpn_data.get('links', [])
+
             
             success_message = (
-                "✅ <b>Отлично! Ты официально под защитой!</b>\n"
+                "✅ <b>Отлично! Ты официально под защитой!</b>\n\n"
                 "✨ <b>Ура! Пробный период активирован!</b> Испытай, каково это быть невидимым и свободным в сети. Пусть злые колдуны отдыхают! 🕶️\n\n"
                 "🧾 <b>Детали оплаты:</b>\n"
                 f"- Чек: <code>{bill_number}</code>\n"
@@ -157,13 +171,14 @@ async def pay_plan_one(callback: CallbackQuery):
                 "📌 <b>Что дальше?</b>\n"
                 "Смело отправляйся в интернет-приключения, но если вдруг тёмные интернет-колдуны попробуют навредить, мы на страже! "
                 "Задай вопросы или получи помощь в нашем <a href='https://t.me/simply_network_support'>чате техподдержки</a>.\n\n"
-                "💪 Спасибо, что выбрал нас!"
+                "💪 Спасибо, что выбрал нас!\n\n"
+                f"<code>{links[0]}</code>"
             )
 
             await rq.update_bill_status(bill_number, True)
             await rq.set_subscription(user_id, bill_number, plan, duration, "Бесплатно")
             await callback.answer('Успешно')
-            await callback.message.answer(success_message, parse_mode="HTML", reply_markup=kb.main)
+            await callback.message.answer(success_message, parse_mode="HTML", reply_markup=kb.how_to_use)
         else:
 
             check = (

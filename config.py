@@ -27,6 +27,7 @@ WEB_SERVER_PORT = int(os.getenv('WEB_SERVER_PORT', 8443))
 WEBHOOK_PATH = os.getenv('WEBHOOK_PATH', '/webhook')
 WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET')
 BASE_WEBHOOK_URL = os.getenv('BASE_WEBHOOK_URL')
+API_URL = os.getenv('API_URL')
 
 # Авторизация Админа в Marzban
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME')
