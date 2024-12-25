@@ -15,6 +15,7 @@ import asyncio
 from app.database.models import Subscription, async_session
 from sqlalchemy import select, update
 from datetime import datetime, timedelta
+import app.keyboards as kb
 
 
 # Инициализация бота и диспетчера
