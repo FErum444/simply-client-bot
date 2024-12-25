@@ -1,0 +1,14 @@
+[Unit]
+Description=Simply VPN Bot
+After=network.target
+
+[Service]
+User=%u
+WorkingDirectory=/home/%u/simply-client-bot
+ExecStart=/home/%u/simply-client-bot/.venv/bin/python /home/%u/simply-client-bot/run.py
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
