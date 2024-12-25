@@ -28,7 +28,7 @@ dp = Dispatcher()
 # Функция для отправки уведомлений
 async def send_notification(tg_id: int, message: str):
     try:
-        await bot.send_message(chat_id=tg_id, text=message)
+        await bot.send_message(chat_id=tg_id, text=message, reply_markup=await kb.inline_buttons(), parse_mode="HTML")
     except Exception as e:
         logging.error(f"Ошибка при отправке сообщения пользователю {tg_id}: {e}")
 
@@ -88,8 +88,8 @@ async def scheduler():
     while True:
         await check_and_update_subscriptions()
         await send_subscription_reminders()
-        # await asyncio.sleep(24 * 60 * 60)
-        await asyncio.sleep(1 * 60)
+        await asyncio.sleep(24 * 60 * 60)
+        # await asyncio.sleep(1 * 60)
 
 
 
