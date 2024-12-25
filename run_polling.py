@@ -10,6 +10,7 @@ from app.database.models import async_main
 from sqlalchemy import select, update
 from app.database.models import Subscription, async_session
 from datetime import datetime, timedelta
+import app.keyboards as kb
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
@@ -18,7 +19,7 @@ dp = Dispatcher()
 # Функция для отправки уведомлений
 async def send_notification(tg_id: int, message: str):
     try:
-        await bot.send_message(chat_id=tg_id, text=message)
+        await bot.send_message(chat_id=tg_id, text=message, reply_markup=await kb.inline_buttons(), parse_mode="HTML")
     except Exception as e:
         logging.error(f"Ошибка при отправке сообщения пользователю {tg_id}: {e}")
 

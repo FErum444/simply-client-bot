@@ -9,7 +9,7 @@ import app.keyboards as kb
 from config import ADMIN_ID
 from app.utils import bill_url, qr_generator, generate_bill_id, payment_validation, calculate_end_date
 import app.database.requests as rq
-from app.services import make_request, check_user_exists, add_new_user, modify_user
+from app.services import make_request, check_user_exists, add_new_user, modify_user, get_user
 
 router = Router()
 
@@ -26,14 +26,14 @@ description_menu = (
 @router.message(CommandStart() or F.data == ('main'))
 async def cmd_start(message: Message):
     await rq.set_user(message.from_user.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name)
-    await message.reply(description_menu, reply_markup=kb.main, parse_mode="HTML")
+    await message.answer(description_menu, reply_markup=kb.main, parse_mode="HTML")
 
 # Главное меню
 @router.callback_query(F.data == ('main'))
 async def cmd_main(callback: CallbackQuery):
     await callback.answer('')
     
-    await callback.message.answer(description_menu, reply_markup=kb.main, parse_mode="HTML")
+    await callback.message.edit_text(description_menu, reply_markup=kb.main, parse_mode="HTML")
 
 # Инфо
 @router.callback_query(F.data == ('info'))
@@ -41,23 +41,29 @@ async def cmd_info(callback: CallbackQuery):
 
     user_id = callback.from_user.id
     active_subscriptions = await rq.get_active_subscriptions(user_id)
+
+
+    token_data, headers = make_request()
+    user_vpn_data = get_user(user_id, token_data)
+    
+    links = user_vpn_data.get('links', [])
     
     if active_subscriptions:
         
         table_rows = ""
         for subscription in active_subscriptions:
-            table_rows += f"Название: {subscription.plan}\nПродолжительность: {subscription.duration} Мес.\nДата приобретения: {subscription.issue_date}\n\n"
+            table_rows += f"<b>Название:</b> {subscription.plan}\n<b>Продолжительность:</b> {subscription.duration} Мес.\n<b>Дата приобретения:</b> {subscription.issue_date}\n\n"
 
         final_end_date = await calculate_end_date(active_subscriptions)
         
-        subscription_message = f"Ваши подписки:\n\n{table_rows}Срок истечения всех подписок: {final_end_date}"
+        subscription_message = f"<b>Ваши подписки:</b>\n\n{table_rows}<b>Срок истечения всех подписок:</b> {final_end_date}\n\n<code>{links[0]}</code>"
 
     else:
         subscription_message = "У вас нет Активных подписок. Самое время выбрать одино из наших классных предложений!"
 
     
     await callback.answer('')
-    await callback.message.answer(subscription_message, reply_markup=kb.main, parse_mode="Markdown")
+    await callback.message.edit_text(subscription_message, reply_markup=kb.main, parse_mode="HTML")
 
 
 # /default
@@ -75,28 +81,28 @@ async def catalog(callback: CallbackQuery):
         "🌍 <b>Добро пожаловать в мир свободного интернета!</b> Мы заботимся о вашей анонимности, доступности и безопасности. "
         "Выбирайте тариф, который подходит именно вам, и забудьте про блокировки, DPI и другие преграды. Всё, что нужно для свободы, — уже здесь!\n\n"
         
-        "<b>1. 1 месяц — Исследователь 🧭</b>\n"
+        "<b>1 месяц — Исследователь 🧭</b>\n"
         "Пробуй интернет без границ бесплатно! \"Исследователь\" — это ваш первый шаг в мир, где блокировки исчезают, как дым. "
         "Скачай приложение, настрой за минуту и убедись, что анонимность — это просто. Начни своё путешествие сегодня!\n"
         "<b>Цена:</b> Бесплатно\n\n"
         
-        "<b>2. 3 месяца — Безопасная Троица 🔐</b>\n"
+        "<b>3 месяца — Безопасная Троица 🔐</b>\n"
         "Три месяца уверенности и спокойствия. \"Безопасная Троица\" защитит тебя и твои данные, оставляя злых интернет-колдунов в стороне. "
         "Низкая стоимость, максимум удобства и полное отсутствие блокировок — всё это в одном пакете.\n"
         "<b>Цена:</b> 2 Ton\n\n"
         
-        "<b>3. 6 месяцев — Мастер Обфускации 🌀</b>\n"
+        "<b>6 месяцев — Мастер Обфускации 🌀</b>\n"
         "Полгода непревзойденной анонимности. \"Мастер обфускации\" виртуозно маскирует твой трафик, превращая его в загадку даже для самых настойчивых. "
         "Легко, доступно и надежно — для тех, кто ценит свободу!\n"
         "<b>Цена:</b> 4 Ton\n\n"
         
-        "<b>4. 12 месяцев — Элитный Страж 🛡</b>\n"
+        "<b>12 месяцев — Элитный Страж 🛡</b>\n"
         "Целый год защиты и свободы в интернете. \"Элитный Страж\" стоит на страже вашей анонимности, обеспечивая высший уровень безопасности. "
         "Забудьте про блокировки и наслаждайтесь стабильностью — всё это за лучшую цену.\n"
         "<b>Цена:</b> 7 Ton"
     )
 
-    await callback.message.answer(tariff_description, reply_markup=await kb.inline_buttons(), parse_mode="HTML")
+    await callback.message.edit_text(tariff_description, reply_markup=await kb.inline_buttons(), parse_mode="HTML")
 
 # Полное Описание Планы подписки
 @router.callback_query(F.data.startswith('plan_'))
@@ -105,10 +111,10 @@ async def category(callback: CallbackQuery):
 
     if plan_data.price > 0:
         await callback.answer('')
-        await callback.message.answer(plan_data.description, reply_markup=await kb.description_plans(callback.data.split('_')[1]))
+        await callback.message.edit_text(plan_data.description, reply_markup=await kb.description_plans(callback.data.split('_')[1]))
     else:
         await callback.answer('')
-        await callback.message.answer(plan_data.description, reply_markup=await kb.free_activate(callback.data.split('_')[1]))
+        await callback.message.edit_text(plan_data.description, reply_markup=await kb.free_activate(callback.data.split('_')[1]))
 
 # Высавление счета на оплату
 @router.callback_query(F.data.startswith('pay_'))
@@ -187,7 +193,7 @@ async def pay_plan_one(callback: CallbackQuery):
             )
 
             await callback.answer('')
-            await callback.message.answer(check, reply_markup=await kb.inline_buttons(), parse_mode="HTML")
+            await callback.message.edit_text(check, reply_markup=await kb.inline_buttons(), parse_mode="HTML")
 
 # Проверка оплаты в блокчейне
 @router.callback_query(F.data.startswith('check_pay_'))
@@ -274,9 +280,9 @@ async def how_to_use(callback: CallbackQuery):
         "<a href='https://github.com/amnezia-vpn/amnezia-client/releases/download/4.8.2.3/AmneziaVPN_4.8.2.3.dmg'>Mac OS</a>, "
         "<a href='https://github.com/amnezia-vpn/amnezia-client/releases/download/4.8.2.3/AmneziaVPN_4.8.2.3_x64.exe'>Windows</a> "
         "и даже <a href='https://github.com/amnezia-vpn/amnezia-client/releases/download/4.8.2.3/AmneziaVPN_4.8.2.3_Linux_installer.tar.zip'>Linux</a>. 🖥\n"
-        "2️⃣ Открой приложение AmneziaVPN и нажми кнопку «Приступим».\n"
-        "3️⃣ Вставляй сюда длинную ссылку, указанную в чеке выше.\n\n"
+        "2️⃣ Открой приложение AmneziaVPN и нажми «Приступим».\n"
+        "3️⃣ Вставляй сюда длинную ссылку, указанную в чеке или меню «Инфо».\n\n"
         "Вуаля! Ты уже серфишь по интернету безопасно и без страха. 🕶"
     )
 
-    await callback.message.answer(tariff_description, reply_markup=await kb.inline_buttons(), parse_mode="HTML")
+    await callback.message.answer(tariff_description, reply_markup=kb.main, disable_web_page_preview=True, parse_mode="HTML")

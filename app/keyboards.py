@@ -9,7 +9,7 @@ from app.database.requests import get_plans
 
 # Главное Меню Инлайн
 main = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Посмотреть тарифы', callback_data='catalog')], [InlineKeyboardButton(text='Инфо', callback_data='info')]
+    [InlineKeyboardButton(text='Посмотреть тарифы', callback_data='catalog')], [InlineKeyboardButton(text='Инфо', callback_data='info')], [InlineKeyboardButton(text='Как пользоваться?', callback_data='how_to_use')]
 ])
 
 # Выбор Тарифа Инлайн (Новая)
@@ -53,5 +53,5 @@ admin_check_point = InlineKeyboardMarkup(inline_keyboard=[
 ])
 
 how_to_use = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Как пользоваться?', callback_data='how_to_use')], [InlineKeyboardButton(text='Инфо', callback_data='info')]
+    [InlineKeyboardButton(text='Как пользоваться?', callback_data='how_to_use')]
 ])

@@ -174,12 +174,15 @@ def modify_user(username, token_data, **kwargs):
     except ValueError as e:
         print(f"Ошибка в параметрах: {e}")
 
-# Упрощённый интерфейс для импорта
-__all__ = [
-    "get_token",
-    "get_valid_token",
-    "make_request",
-    "add_new_user",
-    "check_user_exists",
-    "modify_user"
-]
+
+def get_user(username, token_data):
+
+    url = API_URL + f"/api/user/{username}"
+
+    headers = {
+        'Authorization': f"Bearer {token_data['access_token']}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.get(url, headers=headers, timeout=10)
+    return response.json()
+    
