@@ -210,8 +210,8 @@ async def check_pay(callback: CallbackQuery):
     price = float(plan_data.price)
     
     # Тестовая вализация
-    bill_number = "2d8c75ae3099"
-    price = 2.00
+    # bill_number = "2d8c75ae3099"
+    # price = 2.00
 
     validation = payment_validation(bill_number, price)
 
