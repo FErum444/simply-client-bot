@@ -1,6 +1,6 @@
 # models.py
 
-from sqlalchemy import BigInteger, String, ForeignKey, Integer, Boolean
+from sqlalchemy import BigInteger, String, ForeignKey, Integer, Boolean, Float
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from config import DB_URI
@@ -28,7 +28,7 @@ class Plan(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
     duration: Mapped[int] = mapped_column(Integer)
-    price: Mapped[int] = mapped_column(Integer)
+    price: Mapped[float] = mapped_column(Float)
     description: Mapped[str] = mapped_column(String(255))
 
 class Bill(Base):
@@ -39,7 +39,7 @@ class Bill(Base):
     bill_number: Mapped[str] = mapped_column(String(50))
     status: Mapped[bool] = mapped_column()
     plan: Mapped[str] = mapped_column(ForeignKey('plans.name'))
-    price: Mapped[int] = mapped_column(Integer)
+    price: Mapped[float] = mapped_column(Float)
     pay_link: Mapped[str] = mapped_column(String(255), nullable=True)
     issue_date: Mapped[str] = mapped_column(String(50), nullable=True)
     paid_date: Mapped[str] = mapped_column(String(50), nullable=True)

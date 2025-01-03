@@ -3,9 +3,10 @@ Description=Simply VPN Bot
 After=network.target
 
 [Service]
-User=%u
-WorkingDirectory=/home/%u/simply-client-bot
-ExecStart=/home/%u/simply-client-bot/.venv/bin/python /home/%u/simply-client-bot/run.py
+User=vpn
+WorkingDirectory=/home/vpn/simply-client-bot
+ExecStart=/home/vpn/simply-client-bot/.venv/bin/python /home/vpn/simply-client-bot/run.py
+ExecStop=/bin/kill -s SIGTERM $MAINPID
 Restart=always
 RestartSec=5
 Environment=PYTHONUNBUFFERED=1
